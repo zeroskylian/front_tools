@@ -1,16 +1,17 @@
 import instance, { IAnyObj, FcResponse, Fn } from './base/manager';
 import { CodeError } from './base/tools';
+import { TupleResponse } from './response/response';
 
 export const Get = <T>(
   url: string,
   params: IAnyObj = {},
   headers?: any,
-  clearFn?: Fn
-): Promise<T | undefined> =>
-  new Promise((resolve, reject) => {
+  clearFn?: Fn,
+): TupleResponse<T> =>
+  new Promise(resolve => {
     instance
       .get(url, { params, headers })
-      .then((result) => {
+      .then(result => {
         let res: FcResponse<T>;
         if (clearFn !== undefined) {
           res = clearFn(result.data) as unknown as FcResponse<T>;
@@ -18,14 +19,14 @@ export const Get = <T>(
           res = result.data as FcResponse<T>;
         }
         if (res.code === 0) {
-          resolve(res.data);
+          resolve([null, res.data]);
         } else {
           const err: CodeError = { code: res.code, message: res.msg };
-          reject(err);
+          resolve([err, undefined]);
         }
       })
-      .catch((err) => {
-        reject(err);
+      .catch(err => {
+        resolve([err, undefined]);
       });
   });
 
@@ -34,12 +35,12 @@ export const Post = <T>(
   data: IAnyObj,
   headers?: any,
   params: IAnyObj = {},
-  clearFn?: Fn
-): Promise<T | undefined> => {
-  return new Promise((resolve, reject) => {
+  clearFn?: Fn,
+): TupleResponse<T> => {
+  return new Promise(resolve => {
     instance
       .post(url, data, { params, headers })
-      .then((result) => {
+      .then(result => {
         let res: FcResponse<T>;
         if (clearFn !== undefined) {
           res = clearFn(result.data) as unknown as FcResponse<T>;
@@ -47,14 +48,18 @@ export const Post = <T>(
           res = result.data as FcResponse<T>;
         }
         if (res.code === 0) {
-          resolve(res.data);
+          resolve([null, res.data]);
         } else {
           const err: CodeError = { code: res.code, message: res.msg };
-          reject(err);
+          resolve([err, undefined]);
         }
       })
-      .catch((err) => {
-        reject(err);
+      .catch(err => {
+        resolve([err, undefined]);
       });
   });
 };
+
+const TupleRequest = { Get, Post };
+
+export default TupleRequest;
