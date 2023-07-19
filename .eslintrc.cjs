@@ -52,6 +52,7 @@ module.exports = {
     'no-extra-semi': 1,
     'react/jsx-no-target-blank': 0,
     'react/jsx-uses-react': 'error',
-    'react/jsx-uses-vars': 'error'
+    'react/jsx-uses-vars': 'error',
+    'import/named': ['error', { max: 10 }]
   }
 };
